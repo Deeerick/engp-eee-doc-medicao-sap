@@ -112,7 +112,10 @@ class App:
                         sleep(1)
                         
                 session.findById("wnd[0]/usr/ctxtRIMR0-DFDAT").text = row["Data medicao"]
-                session.findById("wnd[0]/usr/ctxtRIMR0-DFTIM").text = row["Hora medicao"]
+                
+                hr_med = row["Hora medicao"].strftime("%H:%M:%S")
+                session.findById("wnd[0]/usr/ctxtRIMR0-DFTIM").text = hr_med
+                
                 session.findById("wnd[0]/usr/txtRIMR0-DFRDR").text = row["Lido por"]
                 
                 sleep(10)
