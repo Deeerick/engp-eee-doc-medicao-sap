@@ -7,6 +7,7 @@ from utils.config import ERROR_MSG
 
 
 class App:
+    
     def __init__(self, root):
         self.root = root
         self.root.title("ENGP/EEE - Documentos de Medição")
