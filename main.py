@@ -34,7 +34,7 @@ class App:
             root, text="Exportar Log", command=self.export_log, bg='blue', fg='white', width=20)
         self.export_button.grid(row=2, column=1, padx=10, pady=5, sticky='w')
 
-        self.output_text = scrolledtext.ScrolledText(root, width=50, height=8)
+        self.output_text = scrolledtext.ScrolledText(root, width=50, height=15)
         self.output_text.grid(row=3, column=0, columnspan=2, padx=10, pady=5)
 
 
@@ -53,13 +53,28 @@ class App:
         self.output_text.insert(tk.END, 'SAP aberto com sucesso!\n')
         self.output_text.see(tk.END)
         self.root.update_idletasks()
-        sleep(5)
+        sleep(1)
+        
+        if session.findById("wnd[0]/titl").text == "SAP Easy Access":
+            self.output_text.insert(tk.END, 'Usuário e senha não foram necessários!\n')
+            self.output_text.see(tk.END)
+            self.root.update_idletasks()
+            sleep(1)
+        else:
+            session.findById("wnd[0]/usr/txtRSYST-BNAME").text = user
+            session.findById("wnd[0]/usr/pwdRSYST-BCODE").text = password
+            session.findById("wnd[0]").sendVKey(0)
+            
+            self.output_text.insert(tk.END, 'Usuário e senha preenchidos!\n')
+            self.output_text.see(tk.END)
+            self.root.update_idletasks()
+            sleep(1)
 
         # Itera sobre cada linha do DataFrame e imprime os valores das colunas especificadas
         for index, row in df.iterrows():
 
             # Acessa a transação IW41 e insere a ordem de manutenção
-            # session.findById("wnd[0]").resizeWorkingPane(179, 24, False)
+            session.findById("wnd[0]").maximize()
             session.findById("wnd[0]/tbar[0]/okcd").text = "/nIW41"
             session.findById("wnd[0]").sendVKey(0)
 
@@ -182,10 +197,11 @@ class App:
 
                 session.findById("wnd[0]/tbar[0]/btn[3]").press()
                 session.findById("wnd[0]/tbar[0]/btn[11]").press()
-                self.output_text.insert(
-                    tk.END, f"{row['Ordem']} - ordem salva com sucesso!\n")
-                self.output_text.see(tk.END)
-                self.root.update_idletasks()
+                
+            self.output_text.insert(
+                tk.END, f"{row['Ordem']} - ordem salva com sucesso!\n")
+            self.output_text.see(tk.END)
+            self.root.update_idletasks()
 
             self.output_text.see(tk.END)
             self.root.update_idletasks()
