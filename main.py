@@ -38,6 +38,9 @@ class App:
 
         self.output_text = scrolledtext.ScrolledText(root, width=50, height=15)
         self.output_text.grid(row=3, column=0, columnspan=2, padx=10, pady=5)
+        
+        self.label_key = tk.Label(root, text="Desenvolvido por: ENGP/EPM - FLUL")
+        self.label_key.grid(row=4, column=0, columnspan=2, padx=10, pady=5, sticky='we')
     
     
     def main(self):
@@ -189,6 +192,19 @@ class App:
                 session.findById("wnd[0]/tbar[0]/btn[3]").press()
                 session.findById("wnd[0]/tbar[1]/btn[23]").press()
                 session.findById("wnd[1]/usr/btnOPTION2").press()
+                
+                # Preenche os campos da transação
+                hora = hora_menos_um_minuto()
+                session.findById("wnd[0]/usr/txtAFRUD-ISMNW_2").text = '0'
+                session.findById(
+                    "wnd[0]/usr/ctxtAFRUD-ISDD").text = row["Inicio trabalho"]
+                session.findById(
+                    "wnd[0]/usr/ctxtAFRUD-ISDZ").text = hora
+                session.findById(
+                    "wnd[0]/usr/ctxtAFRUD-IEDD").text = row["Fim trabalho"]
+                session.findById(
+                    "wnd[0]/usr/txtAFRUD-LTXA1").text = row["Texto da Confirmacao (Maximo 40 caracteres)"]
+                
                 session.findById("wnd[0]/tbar[1]/btn[9]").press()
                 session.findById("wnd[0]").sendVKey(0)
                 session.findById("wnd[0]/usr/txtRIMR0-MPOBK").setFocus()
@@ -201,14 +217,18 @@ class App:
                         if session.findById(f"wnd[0]/usr/sub:SAPLIMR0:4210/txtIMPT-PTTXT[{i},37]").text == "REGISTRAR TAXA VAZAMENTO GAS":
                             session.findById(f"wnd[0]/usr/sub:SAPLIMR0:4210/txtRIMR0-RDCNT[{
                                              i+1},3]").text = row["Taxa de vazamento (m³/min)"]
+                            
+                            session.findById("wnd[0]/tbar[0]/btn[3]").press()
+                            session.findById("wnd[0]/tbar[0]/btn[11]").press()
+                
                     except Exception as e:
                         self.output_text.insert(
                             tk.END, f"Linha {i} nao possui o texto padrao.\n")
                         self.output_text.see(tk.END)
                         self.root.update_idletasks()
-
-                session.findById("wnd[0]/tbar[0]/btn[3]").press()
-                session.findById("wnd[0]/tbar[0]/btn[11]").press()
+                        
+                        session.findById("wnd[0]/tbar[0]/btn[3]").press()
+                        session.findById("wnd[0]/tbar[0]/btn[11]").press()
                 
             self.output_text.insert(
                 tk.END, f"{row['Ordem']} - ordem salva com sucesso!\n\n")
