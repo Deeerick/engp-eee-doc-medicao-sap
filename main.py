@@ -1,9 +1,11 @@
 import tkinter as tk
 import pandas as pd
+
 from time import sleep
 from tkinter import scrolledtext, filedialog
 from utils.sap_logon import login_sap
 from utils.config import ERROR_MSG
+from utils.cal_hora import hora_menos_um_minuto
 
 
 class App:
@@ -36,8 +38,8 @@ class App:
 
         self.output_text = scrolledtext.ScrolledText(root, width=50, height=15)
         self.output_text.grid(row=3, column=0, columnspan=2, padx=10, pady=5)
-
-
+    
+    
     def main(self):
         user = self.entry_key.get()
         password = self.entry_password.get()
@@ -45,8 +47,15 @@ class App:
         self.output_text.see(tk.END)
         self.root.update_idletasks()
 
-        # Lê a planilha Excel
-        df = pd.read_excel('planilha-padrao.xlsx')
+        try:
+            # Lê a planilha Excel
+            df = pd.read_excel('planilha-padrao.xlsx')
+        except Exception as e:
+            self.output_text.insert(
+                tk.END, "Erro ao ler a planilha. Verifique se o arquivo 'planilha-padrao.xlsx' está na pasta do script.\n")
+            self.output_text.see(tk.END)
+            self.root.update_idletasks()
+            return
 
         # Abre o SAP
         session = login_sap()
@@ -55,7 +64,7 @@ class App:
         self.root.update_idletasks()
         sleep(1)
         
-        if session.findById("wnd[0]/titl").text == "SAP Easy Access":
+        if "SAP Easy Access" in session.findById("wnd[0]/titl").text:
             self.output_text.insert(tk.END, 'Usuário e senha não foram necessários!\n')
             self.output_text.see(tk.END)
             self.root.update_idletasks()
@@ -98,7 +107,7 @@ class App:
                 sleep(1)
 
             # Verifica se "Taxa de vazamento (m³/min)" está vazio
-            if pd.isnull(row['Taxa de vazamento (m³/min)']):
+            if pd.isnull(row['Taxa de vazamento (m³/min)']) or row['Taxa de vazamento (m³/min)'] == 0:
                 self.output_text.insert(
                     tk.END, 'Taxa de vazamento (m³/min) está vazio!\n')
                 self.output_text.see(tk.END)
@@ -117,9 +126,12 @@ class App:
             session.findById("wnd[1]/usr/btnOPTION2").press()
 
             # Preenche os campos da transação
+            hora = hora_menos_um_minuto()
             session.findById("wnd[0]/usr/txtAFRUD-ISMNW_2").text = '0'
             session.findById(
                 "wnd[0]/usr/ctxtAFRUD-ISDD").text = row["Inicio trabalho"]
+            session.findById(
+                "wnd[0]/usr/ctxtAFRUD-ISDZ").text = hora
             session.findById(
                 "wnd[0]/usr/ctxtAFRUD-IEDD").text = row["Fim trabalho"]
             session.findById(
@@ -168,7 +180,7 @@ class App:
                         self.root.update_idletasks()
 
             # Valida se a taxa de vazamento está vazia e preenche o campo no local correto
-            if pd.isnull(row['Taxa de vazamento (m³/min)']):
+            if pd.isnull(row['Taxa de vazamento (m³/min)']) or row['Taxa de vazamento (m³/min)'] == 0:
                 self.output_text.insert(
                     tk.END, 'Taxa de vazamento (m³/min) está vazio!\n')
                 session.findById("wnd[0]/tbar[0]/btn[3]").press()
@@ -199,7 +211,7 @@ class App:
                 session.findById("wnd[0]/tbar[0]/btn[11]").press()
                 
             self.output_text.insert(
-                tk.END, f"{row['Ordem']} - ordem salva com sucesso!\n")
+                tk.END, f"{row['Ordem']} - ordem salva com sucesso!\n\n")
             self.output_text.see(tk.END)
             self.root.update_idletasks()
 
