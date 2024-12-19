@@ -107,7 +107,7 @@ class App:
                 sleep(1)
 
             # Verifica se "Taxa de vazamento (m³/min)" está vazio
-            if pd.isnull(row['Taxa de vazamento (m³/min)']) or row['Taxa de vazamento (m³/min)'] == 0:
+            if pd.isnull(row['Taxa de vazamento (m³/min)']) or row['Taxa de vazamento (m³/min)'] == 0 or row['Taxa de vazamento (m³/min)'] == '0' or row['Taxa de vazamento (m³/min)'] == '0,00':
                 self.output_text.insert(
                     tk.END, 'Taxa de vazamento (m³/min) está vazio!\n')
                 self.output_text.see(tk.END)
@@ -180,7 +180,7 @@ class App:
                         self.root.update_idletasks()
 
             # Valida se a taxa de vazamento está vazia e preenche o campo no local correto
-            if pd.isnull(row['Taxa de vazamento (m³/min)']) or row['Taxa de vazamento (m³/min)'] == 0:
+            if pd.isnull(row['Taxa de vazamento (m³/min)']) or row['Taxa de vazamento (m³/min)'] == 0 or row['Taxa de vazamento (m³/min)'] == '0' or row['Taxa de vazamento (m³/min)'] == '0,00':
                 self.output_text.insert(
                     tk.END, 'Taxa de vazamento (m³/min) está vazio!\n')
                 session.findById("wnd[0]/tbar[0]/btn[3]").press()
